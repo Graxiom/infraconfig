@@ -1,0 +1,34 @@
+{
+  "name": "@pharma/infraconfig",
+  "version": "1.0.0",
+  "description": "Standardized infrastructure configuration management library for all Pharma infrastructure and ERP services",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "extract-config": "dist/bin/extract-config.js",
+    "validate-config": "dist/bin/validate-config.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "rebuild": "npm run clean && npm run build",
+    "test": "jest",
+    "prepublishOnly": "npm run rebuild"
+  },
+  "keywords": [
+    "infrastructure",
+    "configuration",
+    "deployment",
+    "mariadb"
+  ],
+  "author": "Pharma Infrastructure Team",
+  "license": "PROPRIETARY",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {},
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

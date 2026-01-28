@@ -1,0 +1,466 @@
+{
+  "schemaVersion": "1.0",
+  "environment": "qual",
+  "version": 1,
+  "status": "CURRENT",
+  "generatedBy": {
+    "tool": "infra-install",
+    "generatedAtUtc": "2026-01-28T18:09:08.904Z"
+  },
+  "promotedAtUtc": "2026-01-28T18:09:08.904Z",
+  "systems": [
+    {
+      "systemId": "infra-iam",
+      "systemType": "IAM",
+      "components": [
+        {
+          "componentId": "infra-iam-a",
+          "componentType": "AGENT",
+          "endpoint": "http://52.214.19.177:4001",
+          "enabled": true,
+          "deployment": {
+            "mariadbHost": "host.docker.internal",
+            "mariadbPort": 3306,
+            "mariadbUser": "infra_im_user",
+            "mariadbPassword": "EjM49Mbcz4GOAZecxzpeJ8IdwZz3O5Xo",
+            "mariadbDatabase": "infra_iam",
+            "mariadbSslEnabled": false,
+            "mariadbSslRejectUnauthorized": false,
+            "port": 4001,
+            "oidcIssuer": "http://52.214.19.177:4001",
+            "corsOrigin": "*",
+            "cookieSecure": false,
+            "jwtSecret": "wylw19E7GJsaoeNuVicDmx5vJwm2tcHlDoa3k7gVmQ",
+            "refreshTokenEncKey": "NTBi0zwadRn065XHzMCsWArvGLjqgXdVF/w8pitXLDE=",
+            "mfaEncKey": "6QEu6vvgJNYbG6N07mpjy3ee89r0Mc51/T1AW2tPvlw=",
+            "scimSharedSecret": "wbHJSU2oSTAxZuOnNdn951gOqZeWI8W6",
+            "dataShareSecret": "d8diDoPz7OsYgGeSH2Lvt3L0VVV2eeIb",
+            "infraImBaseUrl": "http://52.214.19.177:4002",
+            "infraImBearerToken": "lEFUC9hwiAXvKBBaOPo6C0GfQxZgbN2V0AVuV1QN",
+            "allowDevAdminSeed": true,
+            "bootstrapOidcClientId": "infra-iam-w",
+            "bootstrapOidcRedirectUris": "http://34.245.80.30:8081/auth/callback",
+            "bootstrapOidcAllowedScopes": "openid,profile,email,offline_access",
+            "bootstrapOidcClientSecret": ""
+          }
+        },
+        {
+          "componentId": "infra-iam-w",
+          "componentType": "WEB",
+          "endpoint": "http://34.245.80.30:8081",
+          "enabled": true,
+          "deployment": {
+            "port": 8081,
+            "apiBaseUrl": "http://52.214.19.177:4001",
+            "corsOrigin": "*"
+          }
+        }
+      ]
+    },
+    {
+      "systemId": "infra-im",
+      "systemType": "IM",
+      "components": [
+        {
+          "componentId": "infra-im-a",
+          "componentType": "AGENT",
+          "endpoint": "http://52.214.19.177:4002",
+          "enabled": true,
+          "deployment": {
+            "port": 4002,
+            "host": "0.0.0.0",
+            "mariadbHost": "mariadb",
+            "mariadbPort": 3306,
+            "mariadbUser": "infra_im_user",
+            "mariadbPassword": "EjM49Mbcz4GOAZecxzpeJ8IdwZz3O5Xo",
+            "mariadbDatabase": "infra_im",
+            "mariadbSslEnabled": false,
+            "mariadbMaxConnections": 20,
+            "infraImBaseUrl": "http://52.214.19.177:4002",
+            "infraIamBaseUrl": "http://52.214.19.177:4001",
+            "infraConfigBaseUrl": "http://52.214.19.177:4003",
+            "corsOrigin": "*",
+            "logLevel": "info",
+            "metricsPort": 9090,
+            "healthCheckInterval": 30000,
+            "configPollingInterval": 60000,
+            "nodeEnv": "production"
+          }
+        },
+        {
+          "componentId": "infra-im-w",
+          "componentType": "WEB",
+          "endpoint": "http://34.245.80.30:80",
+          "enabled": true,
+          "deployment": {
+            "port": 80,
+            "containerName": "infra-im-w",
+            "network": "pharma-network",
+            "oidcIssuer": "http://52.214.19.177:4001",
+            "oidcClientId": "infra-im-w",
+            "oidcRedirectUri": "http://34.245.80.30:80/auth/callback",
+            "apiBaseUrl": "http://52.214.19.177:4002",
+            "moduleUrls": {
+              "iam": "http://34.245.80.30:8081",
+              "config": "http://34.245.80.30:8082",
+              "backup": "",
+              "mdg": ""
+            },
+            "moduleApiBaseUrls": {
+              "iam": "http://52.214.19.177:4001",
+              "config": "http://52.214.19.177:4003",
+              "backup": "",
+              "mdg": ""
+            }
+          }
+        }
+      ]
+    },
+    {
+      "systemId": "infra-config",
+      "systemType": "CONFIG",
+      "components": [
+        {
+          "componentId": "infra-config-a",
+          "componentType": "AGENT",
+          "endpoint": "http://52.214.19.177:4003",
+          "enabled": true,
+          "deployment": {
+            "mariadbHost": "host.docker.internal",
+            "mariadbPort": 3306,
+            "mariadbUser": "infra_im_user",
+            "mariadbPassword": "EjM49Mbcz4GOAZecxzpeJ8IdwZz3O5Xo",
+            "mariadbDatabase": "infra_config",
+            "port": 4003,
+            "jwtSecret": "I2YvH43anzhtwu1DbMlhTofpYQ7J7GOffmcsa02Os",
+            "nodeEnv": "production",
+            "logLevel": "info",
+            "infraImBaseUrl": ""
+          }
+        },
+        {
+          "componentId": "infra-config-w",
+          "componentType": "WEB",
+          "endpoint": "http://34.245.80.30:8082",
+          "enabled": true,
+          "deployment": {
+            "port": 8082,
+            "apiBaseUrl": "http://52.214.19.177:4003",
+            "corsOrigin": "*"
+          }
+        }
+      ]
+    },
+    {
+      "systemId": "infra-security",
+      "systemType": "SECURITY",
+      "components": [
+        {
+          "componentId": "infra-security-a",
+          "componentType": "AGENT",
+          "endpoint": "http://52.214.19.177:4004",
+          "enabled": true,
+          "deployment": {
+            "mariadbHost": "host.docker.internal",
+            "mariadbPort": 3306,
+            "mariadbUser": "infra_im_user",
+            "mariadbPassword": "EjM49Mbcz4GOAZecxzpeJ8IdwZz3O5Xo",
+            "mariadbDatabase": "infra_security",
+            "port": 4004,
+            "corsOrigin": "*",
+            "logLevel": "info",
+            "nodeEnv": "production"
+          }
+        },
+        {
+          "componentId": "infra-security-w",
+          "componentType": "WEB",
+          "endpoint": "http://34.245.80.30:8083",
+          "enabled": true,
+          "deployment": {
+            "port": 8083,
+            "apiBaseUrl": "http://52.214.19.177:4004"
+          }
+        }
+      ]
+    },
+    {
+      "systemId": "ess-hub",
+      "systemType": "HUB",
+      "components": [
+        {
+          "componentId": "ess-hub-a",
+          "componentType": "AGENT",
+          "endpoint": "http://54.247.220.175:4001",
+          "enabled": true,
+          "deployment": {
+            "mariadbHost": "host.docker.internal",
+            "mariadbPort": 3306,
+            "mariadbUser": "ess_hub_user",
+            "mariadbPassword": "QFd4HXmuxqvPd0kZBmjIqv3jjZmpltaR",
+            "mariadbDatabase": "ess_hub",
+            "port": 4001,
+            "logLevel": "info",
+            "nodeEnv": "production",
+            "jwtSecret": "1QtaMKB4jF6vBfVYey6qOMvb8IIqo5fcWJ5sPTQ",
+            "jwtAlgorithm": "HS256",
+            "hascoServiceUrl": "http://34.248.86.54:9000/hascoapi",
+            "infraConfigBaseUrl": "http://52.214.19.177:4003",
+            "natsUrl": "nats://34.251.29.240:4222",
+            "natsClientName": "ess-hub-a",
+            "natsStreamName": "pharma-ess-events",
+            "natsConsumerName": "ess-hub-a",
+            "mtlsEnabled": false
+          }
+        }
+      ]
+    },
+    {
+      "systemId": "ess-im",
+      "systemType": "IM",
+      "components": [
+        {
+          "componentId": "agent-im",
+          "componentType": "AGENT",
+          "endpoint": "http://34.251.29.240:4001",
+          "enabled": true,
+          "deployment": {
+            "mariadbHost": "mariadb",
+            "mariadbPort": 3306,
+            "mariadbUser": "agent_im_user",
+            "mariadbPassword": "bHccn19nQLQGV6VDyxGDec9aBiifSrJ0",
+            "mariadbDatabase": "agent_im",
+            "port": 4001,
+            "natsUrl": "nats://nats:4222",
+            "natsStreamName": "pharma-ess-events",
+            "natsSubjectInbound": "pharma.ess.inbound",
+            "logLevel": "info",
+            "metricsPort": 9101
+          }
+        }
+      ]
+    },
+    {
+      "systemId": "ess-erp",
+      "systemType": "ERP",
+      "components": [
+        {
+          "componentId": "agent-erp-mdg",
+          "componentType": "AGENT",
+          "endpoint": "http://54.77.32.178:4001",
+          "enabled": true,
+          "deployment": {
+            "port": 4001,
+            "mariadbHost": "mariadb",
+            "mariadbPort": 3306,
+            "mariadbUser": "agent_erp_mdg",
+            "mariadbPassword": "LRCgVbgfUeMX1b7ntGpMFlZZYOI5rSFw",
+            "mariadbDatabase": "agent_erp_mdg",
+            "mariadbRootPassword": "hKsVTwikZikSU41Q1ycCuQ9quoivEtvh",
+            "redisUrl": "redis://redis:6379",
+            "mdgApiBaseUrl": "http://54.247.220.175:4001/api/mdg/v1",
+            "jwtPublicKeyPath": "/etc/certs/jwt-public.pem",
+            "mtlsCertPath": "/etc/certs/mtls.crt",
+            "mtlsKeyPath": "/etc/certs/mtls.key",
+            "mtlsCaPath": "/etc/certs/ca.crt"
+          }
+        },
+        {
+          "componentId": "agent-erp-im",
+          "componentType": "AGENT",
+          "endpoint": "http://54.77.32.178:4002",
+          "enabled": true,
+          "deployment": {
+            "port": 4002,
+            "apiEndpoint": "http://54.77.32.178:4002",
+            "mariadbHost": "mariadb",
+            "mariadbPort": 3306,
+            "mariadbUser": "erp",
+            "mariadbPassword": "fRkrZrXOYRAjH3GPc6k33QZi7vMNissF",
+            "mariadbDatabase": "erp_im",
+            "mariadbRootPassword": "ha1at8oheRl0Bn7Y79u8Fap6casb9dQa",
+            "mariadbExternalPort": 3306,
+            "natsUrl": "nats://nats:4222",
+            "natsClientPort": 4222,
+            "natsHttpPort": 8222
+          }
+        }
+      ]
+    }
+  ],
+  "installerInputs": {
+    "targets": {
+      "deploy": {
+        "agentsHost": "52.214.19.177",
+        "websHost": "34.245.80.30",
+        "essHubHost": "54.247.220.175",
+        "essImHost": "34.251.29.240",
+        "essErpHost": "54.77.32.178"
+      },
+      "dbPorts": {
+        "agentsDbPort": 3306,
+        "essHubDbPort": 3306,
+        "essImDbPort": 3306,
+        "essErpDbPort": 3306
+      },
+      "rdfHub": {
+        "feHost": "63.35.15.7",
+        "beHost": "34.248.86.54"
+      }
+    },
+    "installationPaths": {
+      "agents": "/var/data",
+      "webs": "/var/data",
+      "essHub": "/var/data",
+      "essIm": "/var/data",
+      "essErp": "/var/data"
+    },
+    "components": [
+      {
+        "id": "ess-erp-im-agent",
+        "kind": "AGENT",
+        "group": "ESS_ERP",
+        "repo": "https://github.com/Graxiom/ess-erp-im-a.git",
+        "branch": "DEV_V0.1",
+        "port": 4002,
+        "relativePath": "",
+        "targetHost": "54.77.32.178",
+        "destinationPath": "/var/data/ess-erp-im-agent",
+        "baseUrl": "http://54.77.32.178:4002"
+      },
+      {
+        "id": "ess-erp-mdg-agent",
+        "kind": "AGENT",
+        "group": "ESS_ERP",
+        "repo": "https://github.com/Graxiom/ess-erp-mdg-a.git",
+        "branch": "DEV_V0.1",
+        "port": 4001,
+        "relativePath": "",
+        "targetHost": "54.77.32.178",
+        "destinationPath": "/var/data/ess-erp-mdg-agent",
+        "baseUrl": "http://54.77.32.178:4001"
+      },
+      {
+        "id": "ess-hub-agent",
+        "kind": "AGENT",
+        "group": "ESS_HUB",
+        "repo": "https://github.com/Graxiom/ess-hub-a.git",
+        "branch": "DEV_V0.1",
+        "port": 4001,
+        "relativePath": "",
+        "targetHost": "54.247.220.175",
+        "destinationPath": "/var/data/ess-hub-agent",
+        "baseUrl": "http://54.247.220.175:4001"
+      },
+      {
+        "id": "ess-im-agent",
+        "kind": "AGENT",
+        "group": "ESS_IM",
+        "repo": "https://github.com/Graxiom/ess-im-a.git",
+        "branch": "DEV_V0.1",
+        "port": 4001,
+        "relativePath": "",
+        "targetHost": "34.251.29.240",
+        "destinationPath": "/var/data/ess-im-agent",
+        "baseUrl": "http://34.251.29.240:4001"
+      },
+      {
+        "id": "infra-config-agent",
+        "kind": "AGENT",
+        "group": "AGENTS",
+        "repo": "https://github.com/Graxiom/infra-config-a.git",
+        "branch": "DEV_V0.1",
+        "port": 4003,
+        "relativePath": "",
+        "targetHost": "52.214.19.177",
+        "destinationPath": "/var/data/infra-config-agent",
+        "baseUrl": "http://52.214.19.177:4003"
+      },
+      {
+        "id": "infra-config-web",
+        "kind": "WEB",
+        "group": "WEBS",
+        "repo": "https://github.com/Graxiom/infra-config-w.git",
+        "branch": "DEV_V0.1",
+        "port": 8082,
+        "relativePath": "",
+        "targetHost": "34.245.80.30",
+        "destinationPath": "/var/data/infra-config-web",
+        "baseUrl": "http://34.245.80.30:8082"
+      },
+      {
+        "id": "infra-iam-agent",
+        "kind": "AGENT",
+        "group": "AGENTS",
+        "repo": "https://github.com/Graxiom/infra-iam-a.git",
+        "branch": "DEV_V0.1",
+        "port": 4001,
+        "relativePath": "",
+        "targetHost": "52.214.19.177",
+        "destinationPath": "/var/data/infra-iam-agent",
+        "baseUrl": "http://52.214.19.177:4001"
+      },
+      {
+        "id": "infra-iam-web",
+        "kind": "WEB",
+        "group": "WEBS",
+        "repo": "https://github.com/Graxiom/infra-iam-w.git",
+        "branch": "DEV_V0.1",
+        "port": 8081,
+        "relativePath": "",
+        "targetHost": "34.245.80.30",
+        "destinationPath": "/var/data/infra-iam-web",
+        "baseUrl": "http://34.245.80.30:8081"
+      },
+      {
+        "id": "infra-im-agent",
+        "kind": "AGENT",
+        "group": "AGENTS",
+        "repo": "https://github.com/Graxiom/infra-im-a.git",
+        "branch": "DEV_V0.1",
+        "port": 4002,
+        "relativePath": "",
+        "targetHost": "52.214.19.177",
+        "destinationPath": "/var/data/infra-im-agent",
+        "baseUrl": "http://52.214.19.177:4002"
+      },
+      {
+        "id": "infra-im-web",
+        "kind": "WEB",
+        "group": "WEBS",
+        "repo": "https://github.com/Graxiom/infra-im-w.git",
+        "branch": "DEV_V0.1",
+        "port": 80,
+        "relativePath": "",
+        "targetHost": "34.245.80.30",
+        "destinationPath": "/var/data/infra-im-web",
+        "baseUrl": "http://34.245.80.30:80"
+      },
+      {
+        "id": "infra-security-agent",
+        "kind": "AGENT",
+        "group": "AGENTS",
+        "repo": "https://github.com/Graxiom/infra-security-a.git",
+        "branch": "DEV_V0.1",
+        "port": 4004,
+        "relativePath": "",
+        "targetHost": "52.214.19.177",
+        "destinationPath": "/var/data/infra-security-agent",
+        "baseUrl": "http://52.214.19.177:4004"
+      },
+      {
+        "id": "infra-security-web",
+        "kind": "WEB",
+        "group": "WEBS",
+        "repo": "https://github.com/Graxiom/infra-security-w.git",
+        "branch": "DEV_V0.1",
+        "port": 8083,
+        "relativePath": "",
+        "targetHost": "34.245.80.30",
+        "destinationPath": "/var/data/infra-security-web",
+        "baseUrl": "http://34.245.80.30:8083"
+      }
+    ]
+  },
+  "contentHash": "68ee3380f2a1f4889e20fb2ca38e0ee4636264d3193dfe388203bbcf972cda9c"
+}

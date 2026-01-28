@@ -1,0 +1,71 @@
+{
+  "schemaVersion": "1.0",
+  "environment": "qual",
+  "version": 1,
+  "status": "CURRENT",
+  "generatedBy": {
+    "tool": "@pharma/infraconfig",
+    "generatedAtUtc": "2026-01-28T16:00:00.000Z"
+  },
+  "promotedAtUtc": "2026-01-28T16:00:00.000Z",
+  "systems": [
+    {
+      "systemId": "infra-iam",
+      "systemType": "IAM",
+      "components": [
+        {
+          "componentId": "infra-iam-a",
+          "componentType": "AGENT",
+          "endpoint": "http://localhost:4001",
+          "enabled": true,
+          "deployment": {
+            "port": 4001,
+            "host": "0.0.0.0",
+            "nodeEnv": "production",
+            "logLevel": "info",
+            "corsOrigin": "*",
+            "mariadbHost": "host.docker.internal",
+            "mariadbPort": 3307,
+            "mariadbUser": "infra_iam_user",
+            "mariadbPassword": "EjM49Mbcz4GOAZecxzpeJ8IdwZz3O5Xo",
+            "mariadbDatabase": "infra_iam",
+            "mariadbRootPassword": "EjM49Mbcz4GOAZecxzpeJ8IdwZz3O5Xo",
+            "mariadbSslEnabled": false,
+            "mariadbSslRejectUnauthorized": false,
+            "mariadbMaxConnections": 20,
+            "oidcIssuer": "http://localhost:4001",
+            "cookieSecure": false,
+            "jwtSecret": "wylw19E7GJsaoeNuVicDmx5vJwm2tcHlDoa3k7gVmQ",
+            "jwtAlgorithm": "HS256",
+            "jwtExpiresIn": "1h",
+            "refreshTokenEncKey": "NTBi0zwadRn065XHzMCsWArvGLjqgXdVF/w8pitXLDE=",
+            "mfaEncKey": "6QEu6vvgJNYbG6N07mpjy3ee89r0Mc51/T1AW2tPvlw=",
+            "scimSharedSecret": "wbHJSU2oSTAxZuOnNdn951gOqZeWI8W6",
+            "dataShareSecret": "d8diDoPz7OsYgGeSH2Lvt3L0VVV2eeIb",
+            "infraImBaseUrl": "http://localhost:4002",
+            "infraImBearerToken": "lEFUC9hwiAXvKBBaOPo6C0GfQxZgbN2V0AVuV1QN",
+            "allowDevAdminSeed": false,
+            "bootstrapOidcClientId": "infra-iam-w",
+            "bootstrapOidcRedirectUris": "http://localhost:8081/auth/callback",
+            "bootstrapOidcAllowedScopes": "openid,profile,email,offline_access",
+            "bootstrapOidcClientSecret": ""
+          }
+        },
+        {
+          "componentId": "infra-iam-w",
+          "componentType": "WEB",
+          "endpoint": "http://localhost:8081",
+          "enabled": true,
+          "deployment": {
+            "port": 8081,
+            "nodeEnv": "production",
+            "logLevel": "info",
+            "corsOrigin": "*",
+            "apiBaseUrl": "http://localhost:4001"
+          }
+        }
+      ]
+    }
+  ],
+  "contentHash": "standardized-mariadb-only-v1"
+}
