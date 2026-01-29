@@ -109,13 +109,36 @@ function toEnvVarName(key) {
  */
 function extractEnvVars(deployment) {
     const envVars = {};
+    // Fields that should be expanded into individual variables
+    const EXPANDABLE_FIELDS = ['moduleUrls', 'moduleApiBaseUrls'];
     // Convert all deployment fields to environment variables
     for (const [key, value] of Object.entries(deployment)) {
         if (value !== null && value !== undefined) {
             const envKey = toEnvVarName(key);
             // Handle complex types
             if (typeof value === 'object') {
-                envVars[envKey] = JSON.stringify(value);
+                // Special handling: expand moduleUrls and moduleApiBaseUrls into VITE_* variables
+                if (EXPANDABLE_FIELDS.includes(key) && value && typeof value === 'object' && !Array.isArray(value)) {
+                    for (const [moduleKey, moduleValue] of Object.entries(value)) {
+                        // moduleUrls.iam → VITE_IAM_URL
+                        // moduleApiBaseUrls.config → VITE_CONFIG_API_BASE_URL
+                        let expandedKey;
+                        if (key === 'moduleUrls') {
+                            expandedKey = `VITE_${moduleKey.toUpperCase()}_URL`;
+                        }
+                        else if (key === 'moduleApiBaseUrls') {
+                            expandedKey = `VITE_${moduleKey.toUpperCase()}_API_BASE_URL`;
+                        }
+                        else {
+                            continue;
+                        }
+                        envVars[expandedKey] = String(moduleValue);
+                    }
+                }
+                else {
+                    // Other objects: keep as JSON
+                    envVars[envKey] = JSON.stringify(value);
+                }
             }
             else if (typeof value === 'boolean') {
                 envVars[envKey] = value ? 'true' : 'false';
@@ -199,6 +222,11 @@ function extractConfig(options) {
     }
     if (config.environment) {
         envVars.INFRA_ENVIRONMENT = config.environment;
+        envVars.ENVIRONMENT = config.environment; // For docker-compose compatibility
+    }
+    // Compatibility mappings for legacy field names
+    if (envVars.OIDC_REDIRECT_URI && !envVars.OIDC_GUI_REDIRECT_URIS) {
+        envVars.OIDC_GUI_REDIRECT_URIS = envVars.OIDC_REDIRECT_URI;
     }
     return {
         componentId: component.componentId,
