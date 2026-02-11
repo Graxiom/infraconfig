@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "1.0",
+  "environment": "TEST",
+  "systems": [
+    {
+      "systemId": "test-sys",
+      "systemType": "TEST",
+      "components": [
+        {
+          "componentId": "test-agent-local",
+          "componentType": "AGENT",
+          "deployment": {
+            "port": 3000,
+            "databaseUsageMode": "LOCAL",
+            "dbLocalUrl": "mariadb://localhost:3306",
+            "dbNetworkKey": "primary-db"
+          }
+        }
+      ]
+    }
+  ]
+}

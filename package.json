@@ -24,11 +24,13 @@
   "author": "Pharma Infrastructure Team",
   "license": "PROPRIETARY",
   "devDependencies": {
-    "@types/node": "^20.0.0",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^20.19.31",
+    "jest": "^30.2.0",
+    "ts-jest": "^29.4.6",
     "typescript": "^5.0.0"
   },
-  "dependencies": {},
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=18.0.0"
   }
 }

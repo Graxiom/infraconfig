@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "1.0",
+  "environment": "TEST",
+  "systems": [
+    {
+      "systemId": "test-sys",
+      "systemType": "TEST",
+      "components": [
+        {
+          "componentId": "test-agent-invalid-shared",
+          "componentType": "AGENT",
+          "deployment": {
+            "port": 3000,
+            "databaseUsageMode": "SHARED",
+            "dbNetworkKey": "primary-db",
+            "dbLocalUrl": "mariadb://otherhost:3306"
+          }
+        }
+      ]
+    }
+  ]
+}

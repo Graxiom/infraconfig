@@ -48,6 +48,11 @@ export interface DeploymentConfig {
   logLevel?: string;
   corsOrigin?: string;  // SINGULAR, not plural
 
+  // Database Usage Specification
+  databaseUsageMode?: 'LOCAL' | 'SHARED' | 'NONE';
+  dbLocalUrl?: string;    // Required if LOCAL
+  dbNetworkKey?: string;  // Required if LOCAL or SHARED
+
   // MariaDB configuration (components with database)
   mariadbHost?: string;
   mariadbPort?: number;

@@ -126,7 +126,30 @@ function validateRequiredParams(component: Component, systemType: string): strin
       if (!deployment.mariadbPassword) warnings.push('WARN: mariadbPassword is missing but other DB fields present');
       if (!deployment.mariadbDatabase) warnings.push('WARN: mariadbDatabase is missing but other DB fields present');
     }
-  }
+    // Database Usage Specification Validation
+    if (deployment.databaseUsageMode) {
+      const mode = deployment.databaseUsageMode;
+      
+      if (!['LOCAL', 'SHARED', 'NONE'].includes(mode)) {
+        warnings.push(`WARN: Invalid databaseUsageMode '${mode}'. Must be LOCAL, SHARED, or NONE`);
+      }
+
+      if (mode === 'LOCAL') {
+        if (!deployment.dbLocalUrl) warnings.push('WARN: dbLocalUrl is required for LOCAL usage mode');
+        if (!deployment.dbNetworkKey) warnings.push('WARN: dbNetworkKey is required for LOCAL usage mode');
+      }
+
+      if (mode === 'SHARED') {
+        if (!deployment.dbNetworkKey) warnings.push('WARN: dbNetworkKey is required for SHARED usage mode');
+        if (deployment.dbLocalUrl) warnings.push('WARN: dbLocalUrl must not be defined for SHARED usage mode');
+      }
+
+      if (mode === 'NONE') {
+        if (deployment.dbLocalUrl || deployment.dbNetworkKey) {
+          warnings.push('WARN: Database fields present but usage mode is NONE');
+        }
+      }
+    }  }
 
   // Check for deprecated fields
   const deprecatedFields = [

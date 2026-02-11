@@ -27,7 +27,7 @@ echo
 
 # Step 1: Validate Node.js version
 echo -e "${BLUE}[1/6]${NC} Checking Node.js version..."
-REQUIRED_NODE_VERSION=20
+REQUIRED_NODE_VERSION=18
 CURRENT_NODE_VERSION=$(node --version | cut -d'v' -f2 | cut -d'.' -f1)
 if [ "$CURRENT_NODE_VERSION" -lt "$REQUIRED_NODE_VERSION" ]; then
     echo -e "${RED}✗${NC} Node.js version must be >= ${REQUIRED_NODE_VERSION} (current: ${CURRENT_NODE_VERSION})"

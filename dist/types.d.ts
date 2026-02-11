@@ -42,6 +42,9 @@ export interface DeploymentConfig {
     nodeEnv?: string;
     logLevel?: string;
     corsOrigin?: string;
+    databaseUsageMode?: 'LOCAL' | 'SHARED' | 'NONE';
+    dbLocalUrl?: string;
+    dbNetworkKey?: string;
     mariadbHost?: string;
     mariadbPort?: number;
     mariadbUser?: string;

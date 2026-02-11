@@ -39,6 +39,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.validate = validate;
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
 function validate(configPath) {
@@ -154,6 +155,60 @@ function validate(configPath) {
                         path: `${depPath}.port`,
                         message: 'Missing required field: port'
                     });
+                }
+                // Database Specification Rules
+                if (dep.databaseUsageMode) {
+                    if (!['LOCAL', 'SHARED', 'NONE'].includes(dep.databaseUsageMode)) {
+                        issues.push({
+                            severity: 'error',
+                            path: `${depPath}.databaseUsageMode`,
+                            message: 'Invalid databaseUsageMode. Must be LOCAL, SHARED, or NONE'
+                        });
+                    }
+                    // Rule 4: Connection Authority (LOCAL)
+                    if (dep.databaseUsageMode === 'LOCAL') {
+                        if (!dep.dbLocalUrl) {
+                            issues.push({
+                                severity: 'error',
+                                path: `${depPath}.dbLocalUrl`,
+                                message: 'dbLocalUrl is required for LOCAL usage mode'
+                            });
+                        }
+                        if (!dep.dbNetworkKey) {
+                            issues.push({
+                                severity: 'error',
+                                path: `${depPath}.dbNetworkKey`,
+                                message: 'dbNetworkKey is required for LOCAL usage mode'
+                            });
+                        }
+                    }
+                    // Rule 2 & 4: Network Visibility & Consumption (SHARED)
+                    if (dep.databaseUsageMode === 'SHARED') {
+                        if (!dep.dbNetworkKey) {
+                            issues.push({
+                                severity: 'error',
+                                path: `${depPath}.dbNetworkKey`,
+                                message: 'dbNetworkKey is required for SHARED usage mode'
+                            });
+                        }
+                        if (dep.dbLocalUrl) {
+                            issues.push({
+                                severity: 'error',
+                                path: `${depPath}.dbLocalUrl`,
+                                message: 'dbLocalUrl must not be defined for SHARED usage mode'
+                            });
+                        }
+                    }
+                    // Rule 3: NONE
+                    if (dep.databaseUsageMode === 'NONE') {
+                        if (dep.dbLocalUrl || dep.dbNetworkKey) {
+                            issues.push({
+                                severity: 'warning',
+                                path: `${depPath}`,
+                                message: 'Database fields present but usage mode is NONE'
+                            });
+                        }
+                    }
                 }
                 // If any mariadb field exists, validate all are present
                 const hasMariadbFields = dep.mariadbHost || dep.mariadbPort || dep.mariadbUser;
