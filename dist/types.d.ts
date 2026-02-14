@@ -43,8 +43,8 @@ export interface DeploymentConfig {
     logLevel?: string;
     corsOrigin?: string;
     databaseUsageMode?: 'LOCAL' | 'SHARED' | 'NONE';
-    dbLocalUrl?: string;
-    dbNetworkKey?: string;
+    localDatabaseUrl?: string;
+    sharedDatabaseDeploymentKey?: string;
     mariadbHost?: string;
     mariadbPort?: number;
     mariadbUser?: string;
@@ -122,6 +122,14 @@ export interface DeploymentConfig {
     mdgapiRetryDelay?: number;
     containerName?: string;
     network?: string;
+    githubRepo?: string;
+    githubBranch?: string;
+    githubCommit?: string;
+    dbLocalUrl?: string;
+    dbNetworkKey?: string;
+    repo?: string;
+    branch?: string;
+    commit?: string;
     moduleUrls?: Record<string, string>;
     moduleApiBaseUrls?: Record<string, string>;
     dbStatementTimeout?: number;

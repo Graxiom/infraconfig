@@ -42,6 +42,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.validate = validate;
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
+const normalize_deployment_1 = require("../normalize-deployment");
 function validate(configPath) {
     const issues = [];
     // Check file exists
@@ -121,6 +122,24 @@ function validate(configPath) {
             }
             const dep = component.deployment;
             const depPath = `${compPath}.deployment`;
+            // Accept legacy field names for compatibility, but warn.
+            const legacyFields = [
+                { key: 'dbLocalUrl', replacement: 'localDatabaseUrl' },
+                { key: 'dbNetworkKey', replacement: 'sharedDatabaseDeploymentKey' },
+                { key: 'repo', replacement: 'githubRepo' },
+                { key: 'branch', replacement: 'githubBranch' },
+                { key: 'commit', replacement: 'githubCommit' }
+            ];
+            for (const { key, replacement } of legacyFields) {
+                if (dep?.[key] !== undefined) {
+                    issues.push({
+                        severity: 'warning',
+                        path: `${depPath}.${key}`,
+                        message: `Legacy field '${key}' is deprecated. Prefer '${replacement}'.`
+                    });
+                }
+            }
+            const normalizedDep = (0, normalize_deployment_1.normalizeDeploymentConfig)(component.deployment);
             // Check for deprecated fields
             const deprecated = {
                 'postgresHost': 'Use mariadbHost instead',
@@ -149,7 +168,7 @@ function validate(configPath) {
             }
             // Validate required fields for AGENT components
             if (component.componentType === 'AGENT') {
-                if (!dep.port) {
+                if (!normalizedDep.port) {
                     issues.push({
                         severity: 'error',
                         path: `${depPath}.port`,
@@ -157,51 +176,41 @@ function validate(configPath) {
                     });
                 }
                 // Database Specification Rules
-                if (dep.databaseUsageMode) {
-                    if (!['LOCAL', 'SHARED', 'NONE'].includes(dep.databaseUsageMode)) {
+                if (normalizedDep.databaseUsageMode) {
+                    if (!['LOCAL', 'SHARED', 'NONE'].includes(normalizedDep.databaseUsageMode)) {
                         issues.push({
                             severity: 'error',
                             path: `${depPath}.databaseUsageMode`,
                             message: 'Invalid databaseUsageMode. Must be LOCAL, SHARED, or NONE'
                         });
                     }
-                    // Rule 4: Connection Authority (LOCAL)
-                    if (dep.databaseUsageMode === 'LOCAL') {
-                        if (!dep.dbLocalUrl) {
+                    // LOCAL: must define a local DB URL
+                    if (normalizedDep.databaseUsageMode === 'LOCAL') {
+                        if (!normalizedDep.localDatabaseUrl) {
                             issues.push({
                                 severity: 'error',
-                                path: `${depPath}.dbLocalUrl`,
-                                message: 'dbLocalUrl is required for LOCAL usage mode'
-                            });
-                        }
-                        if (!dep.dbNetworkKey) {
-                            issues.push({
-                                severity: 'error',
-                                path: `${depPath}.dbNetworkKey`,
-                                message: 'dbNetworkKey is required for LOCAL usage mode'
+                                path: `${depPath}.localDatabaseUrl`,
+                                message: 'localDatabaseUrl is required for LOCAL usage mode'
                             });
                         }
                     }
-                    // Rule 2 & 4: Network Visibility & Consumption (SHARED)
-                    if (dep.databaseUsageMode === 'SHARED') {
-                        if (!dep.dbNetworkKey) {
+                    // SHARED: can be satisfied by a network key OR direct MariaDB connection fields
+                    if (normalizedDep.databaseUsageMode === 'SHARED') {
+                        const hasDirectMariadbConnection = !!(normalizedDep.mariadbHost &&
+                            normalizedDep.mariadbPort &&
+                            normalizedDep.mariadbUser &&
+                            normalizedDep.mariadbDatabase);
+                        if (!normalizedDep.sharedDatabaseDeploymentKey && !hasDirectMariadbConnection) {
                             issues.push({
                                 severity: 'error',
-                                path: `${depPath}.dbNetworkKey`,
-                                message: 'dbNetworkKey is required for SHARED usage mode'
-                            });
-                        }
-                        if (dep.dbLocalUrl) {
-                            issues.push({
-                                severity: 'error',
-                                path: `${depPath}.dbLocalUrl`,
-                                message: 'dbLocalUrl must not be defined for SHARED usage mode'
+                                path: `${depPath}.sharedDatabaseDeploymentKey`,
+                                message: 'For SHARED usage mode, provide sharedDatabaseDeploymentKey OR provide direct MariaDB connection fields (mariadbHost/mariadbPort/mariadbUser/mariadbDatabase)'
                             });
                         }
                     }
                     // Rule 3: NONE
-                    if (dep.databaseUsageMode === 'NONE') {
-                        if (dep.dbLocalUrl || dep.dbNetworkKey) {
+                    if (normalizedDep.databaseUsageMode === 'NONE') {
+                        if (normalizedDep.localDatabaseUrl || normalizedDep.sharedDatabaseDeploymentKey) {
                             issues.push({
                                 severity: 'warning',
                                 path: `${depPath}`,
@@ -211,37 +220,37 @@ function validate(configPath) {
                     }
                 }
                 // If any mariadb field exists, validate all are present
-                const hasMariadbFields = dep.mariadbHost || dep.mariadbPort || dep.mariadbUser;
+                const hasMariadbFields = normalizedDep.mariadbHost || normalizedDep.mariadbPort || normalizedDep.mariadbUser;
                 if (hasMariadbFields) {
-                    if (!dep.mariadbHost) {
+                    if (!normalizedDep.mariadbHost) {
                         issues.push({
                             severity: 'error',
                             path: `${depPath}.mariadbHost`,
                             message: 'mariadbHost required when using MariaDB'
                         });
                     }
-                    if (!dep.mariadbPort) {
+                    if (!normalizedDep.mariadbPort) {
                         issues.push({
                             severity: 'error',
                             path: `${depPath}.mariadbPort`,
                             message: 'mariadbPort required when using MariaDB'
                         });
                     }
-                    if (!dep.mariadbUser) {
+                    if (!normalizedDep.mariadbUser) {
                         issues.push({
                             severity: 'error',
                             path: `${depPath}.mariadbUser`,
                             message: 'mariadbUser required when using MariaDB'
                         });
                     }
-                    if (!dep.mariadbPassword) {
+                    if (!normalizedDep.mariadbPassword) {
                         issues.push({
                             severity: 'warning',
                             path: `${depPath}.mariadbPassword`,
                             message: 'mariadbPassword not set (may be intentional for testing)'
                         });
                     }
-                    if (!dep.mariadbDatabase) {
+                    if (!normalizedDep.mariadbDatabase) {
                         issues.push({
                             severity: 'error',
                             path: `${depPath}.mariadbDatabase`,

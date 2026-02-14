@@ -49,6 +49,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.extractConfig = extractConfig;
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
+const normalize_deployment_1 = require("../normalize-deployment");
 /**
  * Auto-discover component from environment or config
  */
@@ -155,7 +156,7 @@ function extractEnvVars(deployment) {
  */
 function validateRequiredParams(component, systemType) {
     const warnings = [];
-    const deployment = component.deployment;
+    const deployment = (0, normalize_deployment_1.normalizeDeploymentConfig)(component.deployment);
     // Core parameters (all components)
     if (!deployment.port) {
         warnings.push('WARN: Missing required parameter: deployment.port');
@@ -183,19 +184,27 @@ function validateRequiredParams(component, systemType) {
                 warnings.push(`WARN: Invalid databaseUsageMode '${mode}'. Must be LOCAL, SHARED, or NONE`);
             }
             if (mode === 'LOCAL') {
-                if (!deployment.dbLocalUrl)
-                    warnings.push('WARN: dbLocalUrl is required for LOCAL usage mode');
-                if (!deployment.dbNetworkKey)
-                    warnings.push('WARN: dbNetworkKey is required for LOCAL usage mode');
+                if (!deployment.localDatabaseUrl)
+                    warnings.push('WARN: localDatabaseUrl is required for LOCAL usage mode');
             }
             if (mode === 'SHARED') {
-                if (!deployment.dbNetworkKey)
-                    warnings.push('WARN: dbNetworkKey is required for SHARED usage mode');
-                if (deployment.dbLocalUrl)
-                    warnings.push('WARN: dbLocalUrl must not be defined for SHARED usage mode');
+                const hasDirectMariadbConnection = !!(deployment.mariadbHost &&
+                    deployment.mariadbPort &&
+                    deployment.mariadbUser &&
+                    deployment.mariadbDatabase);
+                if (!deployment.sharedDatabaseDeploymentKey && !hasDirectMariadbConnection) {
+                    warnings.push('WARN: For SHARED usage mode, provide sharedDatabaseDeploymentKey OR provide direct MariaDB connection fields (mariadbHost/mariadbPort/mariadbUser/mariadbDatabase)');
+                }
             }
             if (mode === 'NONE') {
-                if (deployment.dbLocalUrl || deployment.dbNetworkKey) {
+                const hasDbFields = !!(deployment.localDatabaseUrl ||
+                    deployment.sharedDatabaseDeploymentKey ||
+                    deployment.mariadbHost ||
+                    deployment.mariadbPort ||
+                    deployment.mariadbUser ||
+                    deployment.mariadbPassword ||
+                    deployment.mariadbDatabase);
+                if (hasDbFields) {
                     warnings.push('WARN: Database fields present but usage mode is NONE');
                 }
             }
@@ -232,10 +241,27 @@ function extractConfig(options) {
     }
     // Discover component
     const { component, systemId, systemType } = discoverComponent(config, options);
+    const deployment = (0, normalize_deployment_1.normalizeDeploymentConfig)(component.deployment);
     // Validate
     const warnings = validateRequiredParams(component, systemType);
     // Extract environment variables
-    const envVars = extractEnvVars(component.deployment);
+    const envVars = extractEnvVars(deployment);
+    // Compatibility env var aliases (legacy scripts)
+    if (envVars.LOCAL_DATABASE_URL && !envVars.DB_LOCAL_URL) {
+        envVars.DB_LOCAL_URL = envVars.LOCAL_DATABASE_URL;
+    }
+    if (envVars.SHARED_DATABASE_DEPLOYMENT_KEY && !envVars.DB_NETWORK_KEY) {
+        envVars.DB_NETWORK_KEY = envVars.SHARED_DATABASE_DEPLOYMENT_KEY;
+    }
+    if (envVars.GITHUB_REPO && !envVars.REPO) {
+        envVars.REPO = envVars.GITHUB_REPO;
+    }
+    if (envVars.GITHUB_BRANCH && !envVars.BRANCH) {
+        envVars.BRANCH = envVars.GITHUB_BRANCH;
+    }
+    if (envVars.GITHUB_COMMIT && !envVars.COMMIT) {
+        envVars.COMMIT = envVars.GITHUB_COMMIT;
+    }
     // Add metadata
     envVars.SYSTEM_ID = systemId;
     envVars.SYSTEM_TYPE = systemType;

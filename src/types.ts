@@ -50,8 +50,8 @@ export interface DeploymentConfig {
 
   // Database Usage Specification
   databaseUsageMode?: 'LOCAL' | 'SHARED' | 'NONE';
-  dbLocalUrl?: string;    // Required if LOCAL
-  dbNetworkKey?: string;  // Required if LOCAL or SHARED
+  localDatabaseUrl?: string;
+  sharedDatabaseDeploymentKey?: string;
 
   // MariaDB configuration (components with database)
   mariadbHost?: string;
@@ -159,6 +159,18 @@ export interface DeploymentConfig {
   // Docker/deployment specific
   containerName?: string;
   network?: string;
+
+  // Git metadata (often provided by bootstrap/installer)
+  githubRepo?: string;
+  githubBranch?: string;
+  githubCommit?: string;
+
+  // Legacy aliases (accepted for compatibility)
+  dbLocalUrl?: string;
+  dbNetworkKey?: string;
+  repo?: string;
+  branch?: string;
+  commit?: string;
 
   // Module URLs (IM-specific)
   moduleUrls?: Record<string, string>;
